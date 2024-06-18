@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:music_player_app_ui/constants.dart';
-import 'curved_card.dart';
+import 'package:mp/components/curved_card.dart';
+import 'package:mp/constants.dart';
 
 class SongRow extends StatelessWidget {
   final String songName;
@@ -11,7 +11,14 @@ class SongRow extends StatelessWidget {
   final double rating;
   final String duration;
 
-  SongRow({this.songName, this.album, this.artistCoverPic, this.isPlaying = false, this.rating, this.duration});
+  SongRow({
+    required this.songName,
+    required this.album,
+    required this.artistCoverPic,
+    this.isPlaying = false,
+    required this.rating,
+    required this.duration,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,10 @@ class SongRow extends StatelessWidget {
         child: Row(
           children: <Widget>[
             ClipRRect(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(12), bottomRight: Radius.circular(12),),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
               child: Image.network(
                 artistCoverPic,
                 height: 60,
@@ -39,28 +49,31 @@ class SongRow extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(songName,
+                    Text(
+                      songName,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
                     ),
-                    SizedBox(height: 6,),
-                    Text(album,
+                    SizedBox(height: 6),
+                    Text(
+                      album,
                       style: TextStyle(
                         fontSize: 12,
                       ),
                     ),
-                    SizedBox(height: 6,),
-                    RatingBar(
-                      onRatingUpdate: (d){},
+                    SizedBox(height: 6),
+                    RatingBarIndicator(
+                      rating: rating,
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      itemCount: 5,
                       itemSize: 12,
                       unratedColor: Colors.grey,
-                      glowColor: Colors.white,
-                      allowHalfRating: true,
-                      initialRating: rating,
-                      itemCount: 5,
-                      itemBuilder: (context, _) => Icon(Icons.star,),
+                      direction: Axis.horizontal,
                     ),
                   ],
                 ),
@@ -68,16 +81,25 @@ class SongRow extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 44, right: 8),
-              child: Text(duration,),
+              child: Text(
+                duration,
+              ),
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Visibility(child: Icon(Icons.equalizer, size: 22,),
+                Visibility(
                   visible: isPlaying,
+                  child: Icon(
+                    Icons.equalizer,
+                    size: 22,
+                  ),
                 ),
-                SizedBox(height: 8,),
-                Icon(Icons.more_vert, size: 22,),
+                SizedBox(height: 8),
+                Icon(
+                  Icons.more_vert,
+                  size: 22,
+                ),
               ],
             )
           ],
@@ -85,5 +107,4 @@ class SongRow extends StatelessWidget {
       ),
     );
   }
-
 }

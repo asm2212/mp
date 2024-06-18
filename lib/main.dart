@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:music_player_app_ui/screens/song_details_screen.dart';
-import 'package:music_player_app_ui/songs_provider.dart';
-import 'components/curved_card.dart';
-import 'components/song_item.dart';
-import 'constants.dart';
-import 'model/song.dart';
+import 'package:mp/components/curved_card.dart';
+import 'package:mp/components/song_item.dart';
+import 'package:mp/constants.dart';
+import 'package:mp/model/song.dart';
+import 'package:mp/screens/song_details_screen.dart';
+import 'package:mp/songs_provider.dart';
 
 void main() => runApp(MusicApp());
 
@@ -29,7 +29,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentBottomTab = 0;
-  int currentSongPosition = -1;       //Initially no song selected
+  int currentSongPosition = -1; // Initially no song selected
+  double sliderValue = 30; // Initial slider value
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListView.builder(
         physics: BouncingScrollPhysics(),
         itemBuilder: (_, position) {
-          Song song = SongsProvider.songs[position % SongsProvider.songs.length];   //Handling out of bounds
+          Song song = SongsProvider.songs[position % SongsProvider.songs.length]; // Handling out of bounds
           return GestureDetector(
             onTap: () {
               setState(() {
@@ -55,7 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             onDoubleTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => SongDetailsScreen(song: song,)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SongDetailsScreen(song: song, key: UniqueKey()),
+                ),
+              );
             },
             child: SongRow(
               songName: song.songName,
@@ -67,29 +73,29 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        itemCount: SongsProvider.songs.length * 2,      //just to populate more data
+        itemCount: SongsProvider.songs.length * 2, // Just to populate more data
       ),
       bottomNavigationBar: _buildBottomBar(),
     );
   }
 
   Widget _buildBottomBar() {
-
     Widget _buildCurrentSongSection() {
-
-      if (currentSongPosition == -1)
-        return Container();
+      if (currentSongPosition == -1) return Container();
 
       Song song = SongsProvider.songs[currentSongPosition % SongsProvider.songs.length];
 
       return Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 4,),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 4),
         child: Column(
           children: <Widget>[
             Row(
               children: <Widget>[
                 ClipRRect(
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), bottomRight: Radius.circular(12),),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomRight: Radius.circular(12),
+                  ),
                   child: Image.network(
                     song.artistCoverPic,
                     height: 45,
@@ -104,28 +110,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(song.songName,
+                        Text(
+                          song.songName,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                           ),
                         ),
-                        SizedBox(height: 6,),
-                        Text(song.album,
+                        SizedBox(height: 6),
+                        Text(
+                          song.album,
                           style: TextStyle(
                             fontSize: 12,
                           ),
                         ),
-                        SizedBox(height: 6,),
-                        RatingBar(
-                          onRatingUpdate: (d){},
-                          itemSize: 12,
-                          unratedColor: Colors.grey,
-                          glowColor: Colors.white,
-                          allowHalfRating: true,
-                          initialRating: song.rating,
+                        SizedBox(height: 6),
+                        RatingBarIndicator(
+                          rating: song.rating,
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
                           itemCount: 5,
-                          itemBuilder: (context, _) => Icon(Icons.star,),
+                          itemSize: 12,
+                          direction: Axis.horizontal,
                         ),
                       ],
                     ),
@@ -133,25 +141,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Row(
                   children: <Widget>[
-                    Icon(Icons.skip_previous,),
-                    SizedBox(width: 4,),
+                    Icon(Icons.skip_previous),
+                    SizedBox(width: 4),
                     CurvedCard(
                       child: Container(
                         padding: EdgeInsets.all(8),
-                        child: Icon(Icons.pause,),
+                        child: Icon(Icons.pause),
                       ),
                       topLeft: 12,
                       bottomRight: 12,
                       color: Color(0xff342D35),
                     ),
-                    SizedBox(width: 4,),
-                    Icon(Icons.skip_next,),
+                    SizedBox(width: 4),
+                    Icon(Icons.skip_next),
                   ],
-                )
+                ),
               ],
             ),
-            Slider(value: 30,
-              onChanged: (d){},
+            Slider(
+              value: sliderValue,
+              onChanged: (newValue) {
+                setState(() {
+                  sliderValue = newValue;
+                });
+              },
               activeColor: Colors.white,
               inactiveColor: Colors.grey,
               min: 0,
@@ -161,7 +174,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
-
 
     return CurvedCard(
       color: Color(0xff574954),
@@ -176,38 +188,41 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               IconButton(
-              icon: Icon(
-                Icons.queue_music,
-                color: currentBottomTab == 0 ? Colors.white : Colors.grey[400],
+                icon: Icon(
+                  Icons.queue_music,
+                  color: currentBottomTab == 0 ? Colors.white : Colors.grey[400],
+                ),
+                padding: EdgeInsets.all(8),
+                onPressed: () {
+                  setState(() {
+                    currentBottomTab = 0;
+                  });
+                },
               ),
-              padding: EdgeInsets.all(8),
-              onPressed: () {
-                setState(() {
-                  currentBottomTab = 0;
-                });
-              }),
               IconButton(
-              icon: Icon(
-                Icons.search,
-                color: currentBottomTab == 1 ? Colors.white : Colors.grey[400],
+                icon: Icon(
+                  Icons.search,
+                  color: currentBottomTab == 1 ? Colors.white : Colors.grey[400],
+                ),
+                padding: EdgeInsets.all(8),
+                onPressed: () {
+                  setState(() {
+                    currentBottomTab = 1;
+                  });
+                },
               ),
-              padding: EdgeInsets.all(8),
-              onPressed: () {
-                setState(() {
-                  currentBottomTab = 1;
-                });
-              }),
               IconButton(
-              icon: Icon(
-                Icons.person_outline,
-                color: currentBottomTab == 2 ? Colors.white : Colors.grey[400],
+                icon: Icon(
+                  Icons.person_outline,
+                  color: currentBottomTab == 2 ? Colors.white : Colors.grey[400],
+                ),
+                padding: EdgeInsets.all(8),
+                onPressed: () {
+                  setState(() {
+                    currentBottomTab = 2;
+                  });
+                },
               ),
-              padding: EdgeInsets.all(8),
-              onPressed: () {
-                setState(() {
-                  currentBottomTab = 2;
-                });
-              }),
             ],
           ),
         ],

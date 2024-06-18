@@ -10,7 +10,7 @@ class CurvedCard extends StatelessWidget {
 
   final Color color;
 
-  const CurvedCard({this.child, this.topLeft = 0, this.topRight = 0, this.bottomLeft = 0, this.bottomRight = 0, this.color});
+  const CurvedCard({required this.child, this.topLeft = 0, this.topRight = 0, this.bottomLeft = 0, this.bottomRight = 0, required this.color});
 
   @override
   Widget build(BuildContext context) {
